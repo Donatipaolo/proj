@@ -1,0 +1,9 @@
+{
+"name": "mylib",
+"type": "static",
+"language": "c",
+"include_dir": "include",
+"src_dir": "src",
+"bin_dir": "bin",
+"deps": []
+}

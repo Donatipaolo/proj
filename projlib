@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# ~/.proj/projlib
+
+
+set -euo pipefail
+shopt -s nullglob
+
+
+BASE_DIR="${HOME}/.proj"
+LIB_DIR="$BASE_DIR/libraries"
+TEMPLATE_DIR="$BASE_DIR/libraries/template"
+
+
+usage() {
+cat <<EOF
+Usage: projlib <command> [options]
+Commands:
+new <name> [--lang c|c++] Create new library skeleton
+build <name> Build library
+clean <name> Clean library
+list List available libraries
+help
+EOF
+}
+
+
+err() { echo "[ERROR] $*" >&2; }
+info() { echo "[INFO] $*"; }
+
+
+cmd_new() {
+local NAME="$1" LANG="c"
+shift || { err "name required"; exit 1; }
+while [[ $# -gt 0 ]]; do
+case "$1" in
+--lang) LANG="$2"; shift 2;;
+*) err "Unknown option $1"; exit 1;;
+esac
+done
+
+
+mkdir -p \
+  "$LIB_DIR/$NAME/include" \
+  "$LIB_DIR/$NAME/src" \
+  "$LIB_DIR/$NAME/bin"
+# create sample header and source
+if [[ "$LANG" == "c" ]]; then
+cat > "$LIB_DIR/$NAME/include/$NAME.h" <<EOF
+#ifndef ${NAME^^}_H
+#define ${NAME^^}_H
+#endif
+EOF
+cat > "$LIB_DIR/$NAME/src/$NAME.c" <<EOF
+#include "${NAME}.h"
+EOF
+else
+cat > "$LIB_DIR/$NAME/include/$NAME.h" <<EOF
+#ifndef ${NAME^^}_H
+#define ${NAME^^}_H
+#endif
+EOF
+cat > "$LIB_DIR/$NAME/src/$NAME.cpp" <<EOF
+#include "${NAME}.h"
+EOF
+fi
+
+
+# Copy Makefile template
+cp "$TEMPLATE_DIR/Makefile" "$LIB_DIR/$NAME/Makefile"
+sed -i "s/{{LIB_NAME}}/${NAME}/g" "$LIB_DIR/$NAME/Makefile"
+
+# create projlib.json metadata
+cat > "$LIB_DIR/$NAME/projlib.json" <<EOF
+{
+"name": "$NAME",
+"type": "static",
+"language": "$LANG",
+"include_dir": "include",
+"src_dir": "src",
+"bin_dir": "bin",
+"deps": []
+}
+EOF
+
+
+info "Library $NAME created in $LIB_DIR/$NAME"
+}
+
+
+cmd_build() {
+local NAME="$1"; shift || { err "name required"; exit 1; }
+if [[ ! -d "$LIB_DIR/$NAME" ]]; then err "library not found"; exit 1; fi
+make -C "$LIB_DIR/$NAME" || { err "build failed"; exit 1; }
+info "Built $NAME"
+}
+
+
+cmd_clean() {
+local NAME="$1"; shift || { err "name required"; exit 1; }
+if [[ ! -d "$LIB_DIR/$NAME" ]]; then err "library not found"; exit 1; fi
+make -C "$LIB_DIR/$NAME" clean || true
+info "Cleaned $NAME"
+}
+
+
+cmd_list() {
+for d in "$LIB_DIR"/*/; do
+[[ -d "$d" ]] || continue
+echo "- $(basename "$d")"
+done
+}
+
+
+if [[ $# -lt 1 ]]; then usage; exit 0; fi
+case "$1" in
+new) shift; cmd_new "$@" ;;
+build) shift; cmd_build "$@" ;;
+clean) shift; cmd_clean "$@" ;;
+list) cmd_list ;;
+help|-h|--help) usage ;;
+*) err "Unknown command"; usage; exit 1 ;;
+esac
