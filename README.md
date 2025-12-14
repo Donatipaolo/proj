@@ -1,4 +1,4 @@
-📦 Proj — C/C++ Project & Library Manager
+#📦 Proj — C/C++ Project & Library Manager
 
 proj è un tool da linea di comando scritto in Bash per creare, gestire e costruire progetti C e C++ con supporto a librerie statiche, Makefile automatici e progetti portabili.
 
@@ -25,9 +25,9 @@ bin/
 libs/
 
 
-⚙️ Generazione automatica dei Makefile
+#⚙️ Generazione automatica dei Makefile
 
-📚 Gestione librerie statiche:
+#📚 Gestione librerie statiche:
 
 librerie globali
 
