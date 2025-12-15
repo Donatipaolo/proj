@@ -37,7 +37,7 @@ proj update-lib  #all
 proj update-lib mylib
 proj update
 proj build
-proj exec
+proj run
 proj package
 EOF
 }
@@ -439,7 +439,7 @@ remove-lib) cmd_remove_lib "$@" ;;
 update-lib) cmd_update_lib "$@" ;;
 update) cmd_update ;;
 build) cmd_build ;;
-exec) cmd_execute ;;
+run) cmd_execute ;;
 package) cmd_package ;;
 help|-h|--help) usage ;;
 *) err "Unknown command $cmd"; usage; exit 1 ;;
