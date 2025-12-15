@@ -24,7 +24,7 @@ remove-lib <libname> Remove lib from project
 update-lib <libname> Refresh lib from archive
 update Update project Makefile fragments
 build Build project (and compiled copied libs)
-exec execute the project
+run execute the project
 package Create a portable tar.gz of project
 help
 
